@@ -1,0 +1,153 @@
+{
+  "_about": "Protocol entries the on-board assistant may quote. Every entry needs at least one source the team has opened; entries without an http source are ignored. Wording is conservative prototype text, not a medical order: flight medicine staff would replace it with mission procedures. To add knowledge, add an entry here (or another .json file in this folder) with id, title, keywords, text, steps and sources.",
+  "entries": [
+    {
+      "id": "SPACE_MOTION_SICKNESS",
+      "category": "SPACEFLIGHT",
+      "title": "Nausea, dizziness or disorientation in the first days of flight",
+      "keywords": [
+        "nausea",
+        "nauseous",
+        "vomit",
+        "vomiting",
+        "dizzy",
+        "dizziness",
+        "disoriented",
+        "motion sickness",
+        "space sickness",
+        "sick stomach",
+        "malaise",
+        "enjoo",
+        "tontura",
+        "throwing up",
+        "spinning",
+        "vertigo",
+        "queasy"
+      ],
+      "text": "Space motion sickness is common. A NASA technical report notes that nearly 70% of astronauts and cosmonauts are affected to some degree during their first several days of flight.",
+      "steps": [
+        "Limit head movements and rest if your schedule allows.",
+        "Tell your Crew Medical Officer, especially if it is severe, starts after the first days of flight or does not get better.",
+        "Any anti-nausea medicine is decided by your Crew Medical Officer with the flight surgeon, not by this app."
+      ],
+      "sources": [
+        {
+          "label": "NASA NTRS 20040089364: Space adaptation syndrome, multiple etiological factors and individual differences",
+          "url": "https://ntrs.nasa.gov/citations/20040089364"
+        },
+        {
+          "label": "Smithsonian Air & Space: Sick in Space",
+          "url": "https://www.smithsonianmag.com/air-space-magazine/sick-in-space-56746153/"
+        }
+      ]
+    },
+    {
+      "id": "HEADACHE_CABIN_CO2",
+      "category": "SPACEFLIGHT",
+      "title": "Headache, congestion or slow thinking: check cabin CO2",
+      "keywords": [
+        "headache",
+        "head ache",
+        "head hurts",
+        "congestion",
+        "stuffy",
+        "foggy",
+        "slow thinking",
+        "concentrate",
+        "co2",
+        "carbon dioxide",
+        "dor de cabeca",
+        "cabeca",
+        "brain fog",
+        "mental fog",
+        "pounding"
+      ],
+      "text": "On the ISS, crew reports of headache and congestion have been associated with cabin CO2 levels, and crews have reported symptoms below the spacecraft maximum allowable concentration. Since 2010, ISS operations have kept the 24-hour average CO2 at or below 4.0 mmHg. Air does not mix by convection in microgravity, so CO2 near you can be higher than a fixed sensor shows.",
+      "steps": [
+        "Check the latest cabin CO2 reading in Space Health or on the station display.",
+        "Tell your Crew Medical Officer and report it to the ground: they decide whether CO2 removal or the work plan should change.",
+        "Note when the headache started and what you were doing; it helps the flight surgeon."
+      ],
+      "sources": [
+        {
+          "label": "NASA NTRS 20160012725: Relationship between CO2 levels and reported congestion and headaches on the ISS",
+          "url": "https://ntrs.nasa.gov/citations/20160012725"
+        },
+        {
+          "label": "NASA NTRS 20150019624: CO2 on the International Space Station, an operations update",
+          "url": "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20150019624.pdf"
+        },
+        {
+          "label": "NASA OCHMO Technical Brief OCHMO-TB-004: Carbon Dioxide",
+          "url": "https://nasa.gov/wp-content/uploads/2023/03/co2-technical-brief-ochmo.pdf"
+        }
+      ]
+    },
+    {
+      "id": "VISION_CHANGE",
+      "category": "SPACEFLIGHT",
+      "title": "A change in your vision (blurring, trouble focusing)",
+      "keywords": [
+        "vision",
+        "blurry",
+        "blurred",
+        "blur",
+        "eyesight",
+        "eye",
+        "eyes",
+        "see",
+        "sans",
+        "visao",
+        "olho",
+        "up close",
+        "reading"
+      ],
+      "text": "Spaceflight Associated Neuro-ocular Syndrome (SANS) is a condition of long-duration spaceflight. A NASA clinical update reports that about 69% of long-duration astronauts show its earliest signs. It is tracked with scheduled eye exams.",
+      "steps": [
+        "Report any new change in your vision to your Crew Medical Officer the same day.",
+        "Keep doing the scheduled eye exams; they are how SANS is tracked."
+      ],
+      "sources": [
+        {
+          "label": "NASA NTRS 20220000516: Spaceflight Associated Neuro-ocular Syndrome (SANS), clinical update",
+          "url": "https://ntrs.nasa.gov/citations/20220000516"
+        },
+        {
+          "label": "NASA: Risk of Spaceflight Associated Neuro-ocular Syndrome",
+          "url": "https://www.nasa.gov/directorates/esdmd/hhp/risk-of-spaceflight-associated-neuro-ocular-syndrome/"
+        }
+      ]
+    },
+    {
+      "id": "VITALS_NEWS2",
+      "category": "SYSTEM",
+      "title": "What the vital-signs score means",
+      "keywords": [
+        "vital",
+        "vitals",
+        "heart rate",
+        "pulse",
+        "oxygen",
+        "spo2",
+        "saturation",
+        "breathing",
+        "temperature",
+        "fever",
+        "blood pressure",
+        "news2",
+        "score"
+      ],
+      "text": "Space Health scores the vital signs it receives with the NEWS2 bands of the Royal College of Physicians: each value earns 0 to 3 points, and a total of 5 or more, or 3 points in one value, asks for an urgent review. NEWS2 was validated in hospitals on Earth, not in space, and our devices do not measure consciousness or oxygen therapy, so the score is partial.",
+      "steps": [
+        "If your score is 5 or more, or one value is far out of range, tell your Crew Medical Officer now.",
+        "Repeat the measurement if you think the sensor slipped."
+      ],
+      "sources": [
+        {
+          "label": "Royal College of Physicians: National Early Warning Score (NEWS) 2",
+          "url": "https://www.rcp.ac.uk/resources/national-early-warning-score-news-2/"
+        }
+      ]
+    }
+  ]
+}

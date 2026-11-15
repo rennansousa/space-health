@@ -1,0 +1,45 @@
+# dependencies and builds
+node_modules/
+dist/
+__pycache__/
+*.pyc
+
+# runtime databases (recreated by backend/reset_demo.py)
+backend/databases/
+
+# team-internal material: meeting recording, chats, drafts (never pushed)
+_equipe/
+*.m4a
+*.zip
+
+# local settings
+.env
+.vscode/
+.DS_Store
+Thumbs.db
+# distress-sound check assets (npm run setup:sound)
+public/mediapipe/
+public/models/
+
+# Kept on the team's machines, not part of the runnable repository:
+# first web version, specs, docs, samples, tests, team notes and helper scripts
+/src/
+/public/
+/scripts/
+/index.html
+/package.json
+/package-lock.json
+/tsconfig.json
+/vite.config.ts
+/tailwind.config.js
+/postcss.config.js
+/specs/
+/docs/
+/samples/
+/backend/tests/
+/app/README.md
+/app/tools/
+/COMO_RODAR.md
+/organizar_pasta.*
+/iniciar.bat
+/publicar_github.bat

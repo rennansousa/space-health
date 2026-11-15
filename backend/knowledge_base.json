@@ -1,0 +1,114 @@
+{
+  "_about": "Guidance shown on action cards. Every entry must cite at least one source the team has opened. Entries without a source are ignored by the loader. These texts are conservative prototype wording, not medical orders; flight medicine staff would replace them with mission procedures.",
+  "defaultFirstStep": "Repeat the measurement to confirm.",
+  "criticalStep": "Call your Crew Medical Officer now.",
+  "genericSteps": ["Review the result with your Crew Medical Officer."],
+  "entries": [
+    {
+      "id": "GLUCOSE_LOW",
+      "analyte": "GLUCOSE",
+      "direction": "LOW",
+      "why": "Blood sugar below 70 mg/dL is considered low.",
+      "steps": [
+        "If it is still low, or you feel shaky, sweaty or confused, follow the 15-15 rule: 15 g of fast-acting carbohydrate, then re-check after 15 minutes.",
+        "Repeat until you are back in range, then eat a snack with protein and carbohydrate.",
+        "Tell your Crew Medical Officer."
+      ],
+      "sources": [
+        {"label": "CDC: Treatment of low blood sugar (hypoglycemia)", "url": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html"}
+      ]
+    },
+    {
+      "id": "POTASSIUM_LOW",
+      "analyte": "POTASSIUM",
+      "direction": "LOW",
+      "why": "Potassium is important to heart and muscle function.",
+      "steps": [
+        "Tell your Crew Medical Officer today.",
+        "Write down any symptoms you notice in your log."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: Potassium blood test", "url": "https://medlineplus.gov/lab-tests/potassium-blood-test/"}
+      ]
+    },
+    {
+      "id": "POTASSIUM_HIGH",
+      "analyte": "POTASSIUM",
+      "direction": "HIGH",
+      "why": "Potassium is important to heart function. A damaged (hemolyzed) sample can falsely raise potassium.",
+      "steps": [
+        "Ask for a new sample if the draw was difficult: a damaged sample can falsely raise potassium.",
+        "Tell your Crew Medical Officer today."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: Potassium test", "url": "https://medlineplus.gov/ency/article/003484.htm"},
+        {"label": "UHNM Pathology: Common problems affecting blood test results", "url": "https://www.uhnm.nhs.uk/our-services/pathology/departments/biochemistry/common-problems-affecting-blood-test-results/"}
+      ]
+    },
+    {
+      "id": "SODIUM_LOW",
+      "analyte": "SODIUM",
+      "direction": "LOW",
+      "why": "Low sodium can cause weakness, fatigue and confusion.",
+      "steps": [
+        "Report weakness, fatigue or confusion right away.",
+        "Tell your Crew Medical Officer."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: Sodium blood test", "url": "https://medlineplus.gov/lab-tests/sodium-blood-test/"}
+      ]
+    },
+    {
+      "id": "SODIUM_HIGH",
+      "analyte": "SODIUM",
+      "direction": "HIGH",
+      "why": "High sodium can be a sign of dehydration.",
+      "steps": [
+        "Review your fluid intake with your Crew Medical Officer."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: Sodium blood test", "url": "https://medlineplus.gov/lab-tests/sodium-blood-test/"}
+      ]
+    },
+    {
+      "id": "BUN_HIGH",
+      "analyte": "UREA_NITROGEN_BUN",
+      "direction": "HIGH",
+      "why": "Urea nitrogen is a waste product filtered by the kidneys; a high value can reflect dehydration.",
+      "steps": [
+        "Review your fluid intake with your Crew Medical Officer.",
+        "Repeat at the next scheduled draw."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: BUN (blood urea nitrogen)", "url": "https://medlineplus.gov/ency/article/003474.htm"}
+      ]
+    },
+    {
+      "id": "AST_HIGH",
+      "analyte": "AST",
+      "direction": "HIGH",
+      "why": "AST is found in the liver and also in muscle; heavy muscle use can raise it.",
+      "steps": [
+        "Log any intense exercise in the 24 hours before the draw.",
+        "Repeat at the next scheduled draw; tell your Crew Medical Officer if it stays high."
+      ],
+      "sources": [
+        {"label": "MedlinePlus: AST test", "url": "https://medlineplus.gov/lab-tests/ast-test/"},
+        {"label": "Mayo Clinic content via Altru: AST blood test", "url": "https://www.altru.org/health-library/procedures/aspartate-aminotransferase-ast-blood-test"}
+      ]
+    },
+    {
+      "id": "SAMPLE_PROBLEM",
+      "analyte": "*",
+      "direction": "*",
+      "why": "When blood waits too long before the serum is separated, glucose falls and potassium rises inside the tube.",
+      "steps": [
+        "Do not act on this value alone. Repeat the measurement with a fresh sample.",
+        "Tell your Crew Medical Officer that several crew members show the same change."
+      ],
+      "sources": [
+        {"label": "NCI Biospecimen Research Database: delayed processing and serum glucose and potassium", "url": "https://brd.nci.nih.gov/brd/paper/jnma-j-nepal-med-assoc/2006/variations-in-serum-glucose-urea-creatinine-and-sodium-and/119650"}
+      ]
+    }
+  ]
+}

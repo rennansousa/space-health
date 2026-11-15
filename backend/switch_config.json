@@ -1,0 +1,1188 @@
+{
+  "schemaVersion": "SH-CANONICAL-1",
+  "description": "Space Health input switch: one declarative file that lists every data source, the analyte catalog, lab reference ranges, exam-text extractors and the rule parameters. Adding a device means adding a block here, not changing the engine.",
+  "nasaDataSources": {
+    "osd575BloodCsv": {
+      "path": "backend/data/osd_575_real_astronaut_blood.csv",
+      "dataset": "NASA Open Science Data Repository OSD-575, SpaceX Inspiration4 comprehensive metabolic panel",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575",
+      "note": "Real data. Four crew members (C001-C004), 19 analytes, 7 draws from L-92 to R+194. Pre-flight draws are used as the personal baseline.",
+      "downloadUrl": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-575/download?source=datamanager&file=LSDS-8_Comprehensive_Metabolic_Panel_CMP.upload_SUBMITTED.csv",
+      "downloadDate": "2026-11-15",
+      "sha256": "dab247eb794edab59aaaa683c85fd1f2dbf4ae3684872739338e10ead4192a0c"
+    }
+  },
+  "rules": {
+    "baseline": {
+      "outOfRangeTolerancePct": 10,
+      "inRangeShiftPct": 25,
+      "minPoints": 2,
+      "_note": "outOfRangeTolerancePct is the default band around the personal baseline; tightly regulated analytes override it with analyteCatalog.personalTolerancePct. Example values, to be set by the flight surgeon."
+    },
+    "artifact": {
+      "minCrew": 3,
+      "minFraction": 0.5
+    },
+    "triage": {
+      "rateWeight": 3.5,
+      "amberUrgency": 20
+    },
+    "redFlags": {
+      "_note": "Example limits for the demo, not clinically validated. To be set by the flight surgeon.",
+      "GLUCOSE": {
+        "below": 54,
+        "above": 400,
+        "unit": "mg/dL"
+      },
+      "POTASSIUM": {
+        "below": 3.0,
+        "above": 6.0,
+        "unit": "mmol/L"
+      },
+      "SODIUM": {
+        "below": 125,
+        "above": 155,
+        "unit": "mmol/L"
+      },
+      "CALCIUM": {
+        "below": 7.0,
+        "above": 12.0,
+        "unit": "mg/dL"
+      }
+    },
+    "missionDayOffsetAfterReturn": 3,
+    "trend": {
+      "minPoints": 3,
+      "horizonDays": 30,
+      "minRSquared": 0.6,
+      "_note": "Watch list only: a straight line through in-mission draws (missionDay >= 0). It never changes the risk tier. Example values, to be set by the flight surgeon."
+    },
+    "news2": {
+      "source": {
+        "title": "Royal College of Physicians. National Early Warning Score (NEWS) 2, Chart 1 and Chart 2 (2017)",
+        "url": "https://www.rcp.ac.uk/resources/national-early-warning-score-news-2/"
+      },
+      "_note": "Bands are [upper limit inclusive, score], ascending; null means 'anything higher'. NEWS2 was validated in hospitals on Earth, not in microgravity. Consciousness and supplemental oxygen are not measured by these devices, so the score is partial.",
+      "mediumAt": 5,
+      "highAt": 7,
+      "maxAgeMinutes": 360,
+      "bands": {
+        "RESP_RATE": [
+          [
+            8,
+            3
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            24,
+            2
+          ],
+          [
+            null,
+            3
+          ]
+        ],
+        "SPO2": [
+          [
+            91,
+            3
+          ],
+          [
+            93,
+            2
+          ],
+          [
+            95,
+            1
+          ],
+          [
+            null,
+            0
+          ]
+        ],
+        "SYSTOLIC_BP": [
+          [
+            90,
+            3
+          ],
+          [
+            100,
+            2
+          ],
+          [
+            110,
+            1
+          ],
+          [
+            219,
+            0
+          ],
+          [
+            null,
+            3
+          ]
+        ],
+        "HEART_RATE": [
+          [
+            40,
+            3
+          ],
+          [
+            50,
+            1
+          ],
+          [
+            90,
+            0
+          ],
+          [
+            110,
+            1
+          ],
+          [
+            130,
+            2
+          ],
+          [
+            null,
+            3
+          ]
+        ],
+        "BODY_TEMP_C": [
+          [
+            35.0,
+            3
+          ],
+          [
+            36.0,
+            1
+          ],
+          [
+            38.0,
+            0
+          ],
+          [
+            39.0,
+            1
+          ],
+          [
+            null,
+            2
+          ]
+        ]
+      }
+    }
+  },
+  "analyteCatalog": {
+    "GLUCOSE": {
+      "label": "Glucose",
+      "system": "metabolic",
+      "scoreWeight": 12,
+      "csvNames": [
+        "GLUCOSE"
+      ]
+    },
+    "UREA_NITROGEN_BUN": {
+      "label": "Urea nitrogen (BUN)",
+      "system": "metabolic",
+      "scoreWeight": 9,
+      "csvNames": [
+        "UREA NITROGEN (BUN)"
+      ]
+    },
+    "CREATININE": {
+      "label": "Creatinine",
+      "system": "metabolic",
+      "scoreWeight": 9,
+      "csvNames": [
+        "CREATININE"
+      ]
+    },
+    "BUN_CREATININE_RATIO": {
+      "label": "BUN/creatinine ratio",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "BUN/CREATININE RATIO"
+      ]
+    },
+    "SODIUM": {
+      "label": "Sodium",
+      "system": "cardiovascular",
+      "scoreWeight": 5,
+      "csvNames": [
+        "SODIUM"
+      ],
+      "personalTolerancePct": 2
+    },
+    "POTASSIUM": {
+      "label": "Potassium",
+      "system": "cardiovascular",
+      "scoreWeight": 14,
+      "csvNames": [
+        "POTASSIUM"
+      ],
+      "personalTolerancePct": 8
+    },
+    "CHLORIDE": {
+      "label": "Chloride",
+      "system": "cardiovascular",
+      "scoreWeight": 5,
+      "csvNames": [
+        "CHLORIDE"
+      ],
+      "personalTolerancePct": 4
+    },
+    "CARBON_DIOXIDE": {
+      "label": "Bicarbonate (CO2)",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "CARBON DIOXIDE"
+      ]
+    },
+    "CALCIUM": {
+      "label": "Calcium",
+      "system": "cardiovascular",
+      "scoreWeight": 5,
+      "csvNames": [
+        "CALCIUM"
+      ],
+      "personalTolerancePct": 4
+    },
+    "PROTEIN_TOTAL": {
+      "label": "Total protein",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "PROTEIN; TOTAL"
+      ]
+    },
+    "ALBUMIN": {
+      "label": "Albumin",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "ALBUMIN"
+      ]
+    },
+    "GLOBULIN": {
+      "label": "Globulin",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "GLOBULIN"
+      ]
+    },
+    "AG_RATIO": {
+      "label": "Albumin/globulin ratio",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "ALBUMIN/GLOBULIN RATIO"
+      ]
+    },
+    "BILIRUBIN_TOTAL": {
+      "label": "Total bilirubin",
+      "system": "metabolic",
+      "scoreWeight": 9,
+      "csvNames": [
+        "BILIRUBIN; TOTAL"
+      ]
+    },
+    "ALKALINE_PHOSPHATASE": {
+      "label": "Alkaline phosphatase",
+      "system": "musculoskeletal",
+      "scoreWeight": 5,
+      "csvNames": [
+        "ALKALINE PHOSPHATASE"
+      ]
+    },
+    "AST": {
+      "label": "AST",
+      "system": "metabolic",
+      "scoreWeight": 9,
+      "csvNames": [
+        "AST"
+      ]
+    },
+    "ALT": {
+      "label": "ALT",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": [
+        "ALT"
+      ]
+    },
+    "IRON_SERUM": {
+      "label": "Serum iron",
+      "system": "blood",
+      "scoreWeight": 9,
+      "csvNames": []
+    },
+    "FERRITIN": {
+      "label": "Ferritin",
+      "system": "blood",
+      "scoreWeight": 9,
+      "csvNames": []
+    },
+    "HEMOGLOBIN": {
+      "label": "Hemoglobin",
+      "system": "blood",
+      "scoreWeight": 12,
+      "csvNames": []
+    },
+    "VITAMIN_D": {
+      "label": "Vitamin D",
+      "system": "musculoskeletal",
+      "scoreWeight": 5,
+      "csvNames": []
+    },
+    "CORTISOL": {
+      "label": "Cortisol",
+      "system": "metabolic",
+      "scoreWeight": 5,
+      "csvNames": []
+    },
+    "SANS_OCT_DELTA_UM": {
+      "label": "Retinal thickness change",
+      "system": "neuro",
+      "scoreWeight": 9,
+      "csvNames": []
+    },
+    "CO2_AMBIENT_MMHG": {
+      "label": "Cabin CO2",
+      "system": "respiratory",
+      "scoreWeight": 9,
+      "csvNames": []
+    },
+    "RADIATION_MSV_DAY": {
+      "label": "Radiation dose",
+      "system": "neuro",
+      "scoreWeight": 9,
+      "csvNames": []
+    },
+    "SPO2_PCT": {
+      "label": "Blood oxygen (SpO2)",
+      "system": "respiratory",
+      "scoreWeight": 14,
+      "csvNames": []
+    },
+    "HR_BPM": {
+      "label": "Heart rate",
+      "system": "cardiovascular",
+      "scoreWeight": 9,
+      "csvNames": []
+    }
+  },
+  "adapters": {
+    "HRF_RIC_BUS": {
+      "enabled": true,
+      "label": "Rack-style medical bus adapter (simulated; no public HRF data feed)",
+      "transport": "ISS HRF PC / Ethernet + RS-422 + MIL-STD-1553",
+      "category": "HARDWARE_RACK",
+      "priority": 1,
+      "requiresAuth": true,
+      "description": "Simulated adapter in the style of a medical rack bus. Translates key names to the canonical record. There is no public data feed from the ISS Human Research Facility.",
+      "defaultMappings": {
+        "HR_BPM": "heartRateBpm",
+        "SPO2": "spo2Pct",
+        "SYS_BP": "systolicMmHg",
+        "PCO2_MMHG": "co2MmHg",
+        "RAD_MSV": "radiationMsVPerDay",
+        "OCT_UM": "trtMicrons"
+      },
+      "status": "SIMULATED",
+      "simulated": true
+    },
+    "PDF_EXAM": {
+      "enabled": true,
+      "label": "Lab report: PDF or pasted text",
+      "transport": "Offline Local File / Store-and-Forward Upload",
+      "category": "DOCUMENT_OCR_REGEX",
+      "priority": 2,
+      "requiresAuth": true,
+      "description": "Extracts blood chemistry, hemoglobin, iron, ferritin, vitamin D, glucose, potassium, BUN, AST, and ALT from PDF streams or plain clinical text using deterministic Regex rules.",
+      "status": "ACTIVE",
+      "simulated": false
+    },
+    "OSD575_CSV_EXCEL": {
+      "enabled": true,
+      "label": "Lab analyzer export: CSV in the NASA OSDR OSD-575 format",
+      "transport": "Offline Pre-Flight / Post-Flight Batch CSV",
+      "category": "SCIENTIFIC_DATASET",
+      "priority": 3,
+      "requiresAuth": true,
+      "description": "Ingests NASA OSDR LSDS-8 Comprehensive Metabolic Panel CSV rows (ANALYTE, VALUE, RANGE_MIN, RANGE_MAX, UNITS, SUBJECT_ID, timepoint).",
+      "status": "ACTIVE",
+      "simulated": false
+    },
+    "BLE_SUIT": {
+      "enabled": true,
+      "label": "Suit vitals over Bluetooth (simulated frames)",
+      "transport": "BLE GATT Service",
+      "category": "WEARABLE_CONTINUOUS",
+      "priority": 4,
+      "requiresAuth": true,
+      "description": "Handles hexadecimal or key-value EVA suit telemetry packets (HR in hex or bpm, SpO2, skin temperature in F or C, respiratory rate).",
+      "status": "SIMULATED",
+      "simulated": true
+    },
+    "LAN_CABIN": {
+      "enabled": true,
+      "label": "Cabin environment over the habitat network (simulated)",
+      "transport": "CCSDS / TCP-UDP Local Mesh",
+      "category": "HABITAT_ENVIRONMENT",
+      "priority": 5,
+      "requiresAuth": true,
+      "description": "Ingests ambient CO2 pockets (ppm or mmHg), cabin pressure (kPa or mmHg), O2 %, and CANS cosmic radiation (mSv/day).",
+      "status": "SIMULATED",
+      "simulated": true
+    },
+    "DEVICE_JSON": {
+      "enabled": true,
+      "label": "Any device or machine over HTTP: JSON readings (Arduino, ESP32, script, analyzer)",
+      "transport": "HTTP POST /api/v1/ingest with a device key",
+      "category": "GENERIC_DEVICE",
+      "priority": 6,
+      "requiresAuth": true,
+      "description": "One JSON body with a list of readings {type, value, unit}. Types come from vitalsCatalog. The device key decides which crew member the readings belong to.",
+      "status": "ACTIVE",
+      "simulated": false
+    },
+    "VOICE_NOTOUCH": {
+      "enabled": false,
+      "label": "Voice symptom log (future adapter, not implemented; spoken questions to the assistant already work in the browser)",
+      "transport": "Local Offline Whisper / WebSpeech PT-EN",
+      "category": "BEHAVIORAL_VOICE",
+      "priority": 6,
+      "requiresAuth": true,
+      "description": "Future adapter: spoken symptom notes as data. Today voice is used only to ask the on-board assistant (browser speech recognition and speech synthesis).",
+      "status": "FUTURE",
+      "simulated": true
+    },
+    "NEURAL_MESH_EEG_FNIRS": {
+      "enabled": false,
+      "label": "EEG / fNIRS headgear (future adapter, not implemented)",
+      "transport": "Local USB/BLE Headband Stream",
+      "category": "NEURO_COGNITIVE",
+      "priority": 7,
+      "requiresAuth": true,
+      "description": "Future adapter. Listed to show how a new device plugs in; no implementation, no data.",
+      "status": "FUTURE",
+      "simulated": true
+    },
+    "FACIAL_FACS_CV": {
+      "enabled": false,
+      "label": "Camera-based vitals (future adapter, not implemented; no emotion inference)",
+      "transport": "Onboard Local Camera (Zero-PII Edge)",
+      "category": "AFFECTIVE_COMPUTING",
+      "priority": 8,
+      "requiresAuth": true,
+      "privacyGuardrail": "Raw negative emotion labels (sadness, fear, anxiety) are routed strictly to GROUND_MANAGER and masked with supportive coaching on ASTRONAUT UI.",
+      "description": "Future adapter. If ever built, limited to camera-based pulse; Space Health does not infer emotions from facial movements.",
+      "status": "FUTURE",
+      "simulated": true
+    },
+    "HAND_TRACKING_AR": {
+      "enabled": false,
+      "label": "Hand-tracking input (future adapter, not implemented)",
+      "transport": "Spatial Camera / MediaPipe Hands",
+      "category": "MOTOR_AUTONOMY",
+      "priority": 9,
+      "requiresAuth": true,
+      "description": "Supports touchless hand gestures during sterile or floating JITT medical procedures (ultrasound probe positioning, checklist advance).",
+      "status": "FUTURE",
+      "simulated": true
+    }
+  },
+  "clinicalReferenceRanges": {
+    "GLUCOSE": {
+      "min": 65.0,
+      "max": 99.0,
+      "unit": "mg/dL",
+      "system": "Metabolic",
+      "weight": 15
+    },
+    "UREA_NITROGEN_BUN": {
+      "min": 7.0,
+      "max": 25.0,
+      "unit": "mg/dL",
+      "system": "Renal/Hydration",
+      "weight": 12
+    },
+    "CREATININE": {
+      "min": 0.6,
+      "max": 1.35,
+      "unit": "mg/dL",
+      "system": "Renal",
+      "weight": 14
+    },
+    "SODIUM": {
+      "min": 135.0,
+      "max": 146.0,
+      "unit": "mmol/L",
+      "system": "Electrolyte",
+      "weight": 15
+    },
+    "POTASSIUM": {
+      "min": 3.5,
+      "max": 5.3,
+      "unit": "mmol/L",
+      "system": "Cardiac/Electrolyte",
+      "weight": 22
+    },
+    "CHLORIDE": {
+      "min": 98.0,
+      "max": 110.0,
+      "unit": "mmol/L",
+      "system": "Electrolyte",
+      "weight": 10
+    },
+    "CARBON_DIOXIDE": {
+      "min": 19.0,
+      "max": 30.0,
+      "unit": "mmol/L",
+      "system": "Respiratory/Blood",
+      "weight": 14
+    },
+    "CALCIUM": {
+      "min": 8.6,
+      "max": 10.3,
+      "unit": "mg/dL",
+      "system": "Bone/Renal",
+      "weight": 14
+    },
+    "PROTEIN_TOTAL": {
+      "min": 6.1,
+      "max": 8.1,
+      "unit": "g/dL",
+      "system": "Nutritional",
+      "weight": 10
+    },
+    "ALBUMIN": {
+      "min": 3.6,
+      "max": 5.1,
+      "unit": "g/dL",
+      "system": "Hepatic/Nutritional",
+      "weight": 12
+    },
+    "GLOBULIN": {
+      "min": 1.9,
+      "max": 3.7,
+      "unit": "g/dL",
+      "system": "Immune/Hepatic",
+      "weight": 8
+    },
+    "BILIRUBIN_TOTAL": {
+      "min": 0.2,
+      "max": 1.2,
+      "unit": "mg/dL",
+      "system": "Hepatic/Hemolysis",
+      "weight": 16
+    },
+    "ALKALINE_PHOSPHATASE": {
+      "min": 36.0,
+      "max": 130.0,
+      "unit": "U/L",
+      "system": "Bone/Hepatic",
+      "weight": 10
+    },
+    "AST": {
+      "min": 10.0,
+      "max": 40.0,
+      "unit": "U/L",
+      "system": "Hepatic/Muscle",
+      "weight": 16
+    },
+    "ALT": {
+      "min": 9.0,
+      "max": 46.0,
+      "unit": "U/L",
+      "system": "Hepatic",
+      "weight": 14
+    },
+    "IRON_SERUM": {
+      "min": 60.0,
+      "max": 170.0,
+      "unit": "µg/dL",
+      "system": "Hematology/SpaceAnemia",
+      "weight": 18
+    },
+    "FERRITIN": {
+      "min": 30.0,
+      "max": 300.0,
+      "unit": "ng/mL",
+      "system": "Hematology/IronStore",
+      "weight": 14
+    },
+    "HEMOGLOBIN": {
+      "min": 13.5,
+      "max": 17.5,
+      "unit": "g/dL",
+      "system": "Hematology/O2",
+      "weight": 20
+    },
+    "VITAMIN_D": {
+      "min": 30.0,
+      "max": 100.0,
+      "unit": "ng/mL",
+      "system": "Bone/Immune",
+      "weight": 10
+    },
+    "CORTISOL": {
+      "min": 5.0,
+      "max": 23.0,
+      "unit": "µg/dL",
+      "system": "Stress/HPA",
+      "weight": 12
+    },
+    "CO2_AMBIENT_MMHG": {
+      "min": 0.2,
+      "max": 3.5,
+      "unit": "mmHg",
+      "system": "ECLSS_Habitat",
+      "weight": 18
+    },
+    "RADIATION_MSV_DAY": {
+      "min": 0.05,
+      "max": 0.65,
+      "unit": "mSv/day",
+      "system": "SpaceWeather_CANS",
+      "weight": 20
+    },
+    "SANS_OCT_DELTA_UM": {
+      "min": 0.0,
+      "max": 19.4,
+      "unit": "µm",
+      "system": "Ocular_SANS",
+      "weight": 20
+    },
+    "SPO2_PCT": {
+      "min": 94.0,
+      "max": 100.0,
+      "unit": "%",
+      "system": "Cardiorespiratory",
+      "weight": 25
+    },
+    "HR_BPM": {
+      "min": 48.0,
+      "max": 105.0,
+      "unit": "bpm",
+      "system": "Cardiovascular",
+      "weight": 16
+    }
+  },
+  "pdfRegexExtractors": [
+    {
+      "analyte": "IRON_SERUM",
+      "displayName": "Serum iron",
+      "patterns": [
+        "(?:ferro\\s*(?:s[eé]rico|total)?|serum\\s*iron|iron\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "µg/dL",
+      "units": {
+        "ug/dl": 1,
+        "umol/l": 5.587
+      },
+      "plausible": [
+        5,
+        1000
+      ]
+    },
+    {
+      "analyte": "FERRITIN",
+      "displayName": "Ferritin",
+      "patterns": [
+        "(?:ferritina|ferritin)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "ng/mL",
+      "units": {
+        "ng/ml": 1,
+        "ug/l": 1
+      },
+      "plausible": [
+        1,
+        50000
+      ]
+    },
+    {
+      "analyte": "HEMOGLOBIN",
+      "displayName": "Hemoglobin",
+      "patterns": [
+        "(?:hemoglobina|hemoglobin|\\bhgb\\b|\\bhb\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "g/dL",
+      "units": {
+        "g/dl": 1,
+        "g/l": 0.1
+      },
+      "plausible": [
+        3,
+        25
+      ]
+    },
+    {
+      "analyte": "VITAMIN_D",
+      "displayName": "Vitamin D",
+      "patterns": [
+        "(?:vitamina\\s*d|vitamin\\s*d|25[-\\s]?oh[-\\s]?d)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "ng/mL",
+      "units": {
+        "ng/ml": 1,
+        "nmol/l": 0.4
+      },
+      "plausible": [
+        1,
+        250
+      ]
+    },
+    {
+      "analyte": "GLUCOSE",
+      "displayName": "Glucose",
+      "patterns": [
+        "(?:glicemia|glicose|glucose)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 1,
+        "mmol/l": 18.0
+      },
+      "plausible": [
+        10,
+        1500
+      ]
+    },
+    {
+      "analyte": "POTASSIUM",
+      "displayName": "Potassium",
+      "patterns": [
+        "(?:pot[aá]ssio|potassium|\\bk\\+\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mmol/L",
+      "units": {
+        "mmol/l": 1,
+        "meq/l": 1
+      },
+      "plausible": [
+        1,
+        10
+      ]
+    },
+    {
+      "analyte": "SODIUM",
+      "displayName": "Sodium",
+      "patterns": [
+        "(?:s[oó]dio|sodium|\\bna\\+\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mmol/L",
+      "units": {
+        "mmol/l": 1,
+        "meq/l": 1
+      },
+      "plausible": [
+        90,
+        200
+      ]
+    },
+    {
+      "analyte": "CHLORIDE",
+      "displayName": "Chloride",
+      "patterns": [
+        "(?:cloreto|chloride|\\bcl-?)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mmol/L",
+      "units": {
+        "mmol/l": 1,
+        "meq/l": 1
+      },
+      "plausible": [
+        50,
+        160
+      ]
+    },
+    {
+      "analyte": "CARBON_DIOXIDE",
+      "displayName": "Bicarbonate (total CO2)",
+      "patterns": [
+        "(?:bicarbonat[oe]s?|\\bhco3-?|co2\\s*total|total\\s*co2|carbon\\s*dioxide(?:\\s*\\(?total\\)?)?)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mmol/L",
+      "units": {
+        "mmol/l": 1,
+        "meq/l": 1
+      },
+      "plausible": [
+        3,
+        60
+      ]
+    },
+    {
+      "analyte": "UREA_NITROGEN_BUN",
+      "displayName": "Urea nitrogen (BUN)",
+      "patterns": [
+        "(?:urea\\s*nitrogen|blood\\s*urea\\s*nitrogen|\\bbun\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 1,
+        "mmol/l": 2.8
+      },
+      "plausible": [
+        1,
+        200
+      ]
+    },
+    {
+      "analyte": "UREA_NITROGEN_BUN",
+      "displayName": "Urea (converted to BUN)",
+      "patterns": [
+        "(?:\\bur[eé]ia\\b|\\burea\\b(?!\\s*nitrogen))(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 0.4665,
+        "mmol/l": 2.8
+      },
+      "plausible": [
+        1,
+        200
+      ],
+      "_note": "Urea is reported in Brazil and Europe; BUN = urea x 28.02/60.06 (mg/dL), or urea mmol/L x 2.8."
+    },
+    {
+      "analyte": "CREATININE",
+      "displayName": "Creatinine",
+      "patterns": [
+        "(?:creatinina|creatinine)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 1,
+        "umol/l": 0.0113
+      },
+      "plausible": [
+        0.1,
+        25
+      ]
+    },
+    {
+      "analyte": "CALCIUM",
+      "displayName": "Calcium",
+      "patterns": [
+        "(?:c[aá]lcio|calcium)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 1,
+        "mmol/l": 4.0
+      },
+      "plausible": [
+        3,
+        20
+      ]
+    },
+    {
+      "analyte": "PROTEIN_TOTAL",
+      "displayName": "Total protein",
+      "patterns": [
+        "(?:prote[ií]nas?\\s*totais|prote[ií]na\\s*total|total\\s*protein|protein[;,\\s]*total)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "g/dL",
+      "units": {
+        "g/dl": 1,
+        "g/l": 0.1
+      },
+      "plausible": [
+        2,
+        15
+      ]
+    },
+    {
+      "analyte": "ALBUMIN",
+      "displayName": "Albumin",
+      "patterns": [
+        "(?:albumina|albumin)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "g/dL",
+      "units": {
+        "g/dl": 1,
+        "g/l": 0.1
+      },
+      "plausible": [
+        0.5,
+        7
+      ]
+    },
+    {
+      "analyte": "GLOBULIN",
+      "displayName": "Globulin",
+      "patterns": [
+        "(?:globulinas?|globulin)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "g/dL",
+      "units": {
+        "g/dl": 1,
+        "g/l": 0.1
+      },
+      "plausible": [
+        0.5,
+        10
+      ]
+    },
+    {
+      "analyte": "BILIRUBIN_TOTAL",
+      "displayName": "Total bilirubin",
+      "patterns": [
+        "(?:bilirrubina\\s*(?:total)?|bilirubin[;\\s]*(?:total)?)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mg/dL",
+      "units": {
+        "mg/dl": 1,
+        "umol/l": 0.0584
+      },
+      "plausible": [
+        0,
+        50
+      ]
+    },
+    {
+      "analyte": "ALKALINE_PHOSPHATASE",
+      "displayName": "Alkaline phosphatase",
+      "patterns": [
+        "(?:fosfatase\\s*alcalina|alkaline\\s*phosphatase|\\balp\\b|\\bfa\\b)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "U/L",
+      "units": {
+        "u/l": 1,
+        "ui/l": 1,
+        "iu/l": 1
+      },
+      "plausible": [
+        1,
+        5000
+      ]
+    },
+    {
+      "analyte": "AST",
+      "displayName": "AST",
+      "patterns": [
+        "(?:\\bast\\b|\\btgo\\b|aspartate\\s*aminotransferase)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "U/L",
+      "units": {
+        "u/l": 1,
+        "ui/l": 1,
+        "iu/l": 1
+      },
+      "plausible": [
+        1,
+        20000
+      ]
+    },
+    {
+      "analyte": "ALT",
+      "displayName": "ALT",
+      "patterns": [
+        "(?:\\balt\\b|\\btgp\\b|alanine\\s*aminotransferase)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "U/L",
+      "units": {
+        "u/l": 1,
+        "ui/l": 1,
+        "iu/l": 1
+      },
+      "plausible": [
+        1,
+        20000
+      ]
+    },
+    {
+      "analyte": "CORTISOL",
+      "displayName": "Cortisol",
+      "patterns": [
+        "(?:cortisol)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "µg/dL",
+      "units": {
+        "ug/dl": 1,
+        "nmol/l": 0.0362
+      },
+      "plausible": [
+        0.1,
+        100
+      ]
+    },
+    {
+      "analyte": "SANS_OCT_DELTA_UM",
+      "displayName": "Retinal thickness change",
+      "patterns": [
+        "(?:sans\\s*oct|oct\\s*delta|trt\\s*delta|espessura\\s*retiniana)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*\\+?([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "µm",
+      "units": {
+        "um": 1
+      },
+      "plausible": [
+        0,
+        500
+      ]
+    },
+    {
+      "analyte": "CO2_AMBIENT_MMHG",
+      "displayName": "Cabin CO2",
+      "patterns": [
+        "(?:co2\\s*(?:da\\s*)?(?:cabine|ambient[e]?|cabin)|ppco2|cabin\\s*co2)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mmHg",
+      "units": {
+        "mmhg": 1,
+        "ppm": 0.00076
+      },
+      "plausible": [
+        0,
+        30
+      ]
+    },
+    {
+      "analyte": "RADIATION_MSV_DAY",
+      "displayName": "Radiation dose",
+      "patterns": [
+        "(?:radia[cç][aã]o|radiation|cans\\s*dose)(?:\\s*\\([^)\\n]{1,20}\\))?\\s*[:\\-=]?\\s*([0-9]+(?:[.,][0-9]+)?)"
+      ],
+      "defaultUnit": "mSv/day",
+      "units": {
+        "msv/day": 1,
+        "msv/d": 1,
+        "msv": 1
+      },
+      "plausible": [
+        0,
+        100
+      ]
+    }
+  ],
+  "vitalsCatalog": {
+    "HEART_RATE": {
+      "label": "Heart rate",
+      "unit": "bpm",
+      "normalMin": 51,
+      "normalMax": 90,
+      "plausibleMin": 20,
+      "plausibleMax": 250,
+      "aliases": [
+        "HR",
+        "PULSE",
+        "HR_BPM"
+      ],
+      "rangeSource": "NEWS2 zero-score band (Royal College of Physicians, 2017)"
+    },
+    "SPO2": {
+      "label": "Oxygen saturation (SpO2)",
+      "unit": "%",
+      "normalMin": 96,
+      "normalMax": 100,
+      "plausibleMin": 50,
+      "plausibleMax": 100,
+      "aliases": [
+        "SPO2_PCT",
+        "OXYGEN_SATURATION"
+      ],
+      "rangeSource": "NEWS2 zero-score band (Royal College of Physicians, 2017)"
+    },
+    "RESP_RATE": {
+      "label": "Breathing rate",
+      "unit": "breaths/min",
+      "normalMin": 12,
+      "normalMax": 20,
+      "plausibleMin": 3,
+      "plausibleMax": 70,
+      "aliases": [
+        "RR",
+        "RESPIRATORY_RATE"
+      ],
+      "rangeSource": "NEWS2 zero-score band (Royal College of Physicians, 2017)"
+    },
+    "BODY_TEMP_C": {
+      "label": "Body temperature",
+      "unit": "°C",
+      "normalMin": 36.1,
+      "normalMax": 38.0,
+      "plausibleMin": 30,
+      "plausibleMax": 43,
+      "aliases": [
+        "TEMP",
+        "TEMPERATURE"
+      ],
+      "acceptsUnits": [
+        "C",
+        "F"
+      ],
+      "rangeSource": "NEWS2 zero-score band (Royal College of Physicians, 2017)"
+    },
+    "SYSTOLIC_BP": {
+      "label": "Systolic blood pressure",
+      "unit": "mmHg",
+      "normalMin": 111,
+      "normalMax": 219,
+      "plausibleMin": 50,
+      "plausibleMax": 280,
+      "aliases": [
+        "SBP",
+        "SYS_BP"
+      ],
+      "rangeSource": "NEWS2 zero-score band (Royal College of Physicians, 2017)"
+    },
+    "DIASTOLIC_BP": {
+      "label": "Diastolic blood pressure",
+      "unit": "mmHg",
+      "normalMin": null,
+      "normalMax": null,
+      "plausibleMin": 20,
+      "plausibleMax": 180,
+      "aliases": [
+        "DBP",
+        "DIA_BP"
+      ],
+      "rangeSource": "Stored and shown; not scored"
+    },
+    "CABIN_CO2_MMHG": {
+      "label": "Cabin CO2 (partial pressure)",
+      "unit": "mmHg",
+      "normalMin": null,
+      "normalMax": 4.0,
+      "plausibleMin": 0,
+      "plausibleMax": 30,
+      "aliases": [
+        "CO2",
+        "CO2_MMHG",
+        "CO2_AMBIENT_MMHG"
+      ],
+      "acceptsUnits": [
+        "mmHg",
+        "ppm"
+      ],
+      "cabin": true,
+      "rangeSource": "ISS operational limit since 2010: 24-hour average CO2 at or below 4.0 mmHg (NASA NTRS 20150019624). One reading is not a 24-hour average."
+    }
+  },
+  "assistant": {
+    "llmUrl": "http://127.0.0.1:11434",
+    "llmModel": "",
+    "_note": "Defaults: no model, keyword search only. router = none | ollama | needle | needle,ollama (env SPACE_HEALTH_ROUTER; later engines are asked only for the earlier one's exceptions): a small model only maps the crew member's words to catalog ids (closed list, validated), may escalate to emergency or medicine refusal, never de-escalate. rephrase (env SPACE_HEALTH_LLM_REPHRASE=1) lets the Ollama model rephrase the checked text; off by default, so the crew always reads the curated wording. The model never decides.",
+    "timeoutSeconds": 90,
+    "maxSources": 3,
+    "minScore": 1.2,
+    "router": "none",
+    "rephrase": false
+  },
+  "_unitsNote": "pdfRegexExtractors[].units maps the unit printed in a report (lower case, µ written u) to the factor that converts it to the canonical unit in clinicalReferenceRanges. Factors from the Labcorp SI Unit Conversion Table (https://www.labcorp.com/test-menu/resources/si-unit-conversion-table). A unit not listed is refused. 'plausible' is a sanity range in the canonical unit used only to catch unit mistakes; it is not clinical."
+}
