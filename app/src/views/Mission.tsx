@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { ActivityMap, Badges, PlayerCard } from '../components/ActivityMap';
 import { Badge, Icon, Seg, Sheet } from '../components/ui';
-import { fmt, sortedCards, tierSt } from '../lib/health';
+import { useMissionGame } from '../lib/game';
+import { fmt, tierSt } from '../lib/health';
 import { ago, clock, useLang } from '../lib/i18n';
 import type { Card, CrewState, HistoryItem } from '../types';
 
@@ -10,22 +12,12 @@ export function Mission({ state, onCard, onStep }: { state: CrewState; onCard: (
   const { t, lang } = useLang();
   const [sector, setSector] = useState<Sector>('act');
   const [draw, setDraw] = useState<HistoryItem | null>(null);
-  const cards = sortedCards(state.cards).filter((c) => c.riskTier !== 'ROUTINE');
+  const game = useMissionGame(state);
   const draws = [...state.history].reverse(); // oldest → newest
 
   return (
     <div className="mission">
-      <div className="progress-hero">
-        <div className="ring" style={{ ['--p' as string]: `${state.progress.pct}%` }}>
-          <span>{state.progress.pct}%</span>
-        </div>
-        <div className="col">
-          <b>
-            {state.progress.done}/{state.progress.total} {t('stepsDone')}
-          </b>
-          <span className="muted sm">{state.astronaut.displayName}</span>
-        </div>
-      </div>
+      <PlayerCard game={game} />
 
       <Seg
         value={sector}
@@ -38,29 +30,10 @@ export function Mission({ state, onCard, onStep }: { state: CrewState; onCard: (
       />
 
       {sector === 'act' && (
-        <ol className="journey">
-          {cards.length === 0 && <p className="empty">{t('nothingToDo')}</p>}
-          {cards.flatMap((c) =>
-            c.whatToDoNow.map((s, i) => {
-              const done = !!c.stepsDone?.[i];
-              const firstOpen = (c.stepsDone ?? []).findIndex((d) => !d);
-              const current = !done && i === (firstOpen < 0 ? -1 : firstOpen);
-              return (
-                <li key={c.cardId + i} className={`stop${done ? ' done' : ''}${current ? ' current' : ''}`}>
-                  <button className="stop-dot" aria-pressed={done} aria-label={s} onClick={() => onStep(c, i, !done)}>
-                    {done ? <Icon name="check" size={18} /> : i + 1}
-                  </button>
-                  <button className="stop-body" onClick={() => onCard(c)}>
-                    <b>{s}</b>
-                    <span className="muted sm">
-                      {c.label} · {current ? t('nextUp') : done ? t('done') : ''}
-                    </span>
-                  </button>
-                </li>
-              );
-            }),
-          )}
-        </ol>
+        <>
+          <ActivityMap game={game} onCard={onCard} onStep={onStep} name={state.astronaut.displayName.replace(/^Crew member /, '')} />
+          <Badges game={game} />
+        </>
       )}
 
       {sector === 'exam' && (

@@ -24,6 +24,11 @@ function belongs(organ: OrganId, analyte: string, system: string): boolean {
   return r.analytes.includes(analyte) || (r.systems.includes(system) && !ORGAN_IDS.some((o) => o !== organ && ORGAN_RULES[o].analytes.includes(analyte)));
 }
 
+/** The organ mascot that speaks for a card, or null when no organ owns it (e.g. glucose). */
+export function organOf(c: Pick<Card, 'analyte' | 'system'>): OrganId | null {
+  return ORGAN_IDS.find((o) => belongs(o, c.analyte, c.system)) ?? null;
+}
+
 const TIER_RANK: Record<string, number> = { CRITICAL: 3, ATTENTION: 2, ROUTINE: 1 };
 function tierToSt(rank: number): St {
   return rank >= 3 ? 'crit' : rank === 2 ? 'att' : rank === 1 ? 'ok' : 'none';

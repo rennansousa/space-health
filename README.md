@@ -52,7 +52,10 @@ On the way to Mars an answer from Earth can take up to 48 minutes round trip, an
 | Symptom report by body region, intensity, onset and duration | Approve, reject or send a directive to the crew |
 | Works with no link: the last data stays on the device and new records wait in an outbox | Delayed delivery: a directive arrives after the simulated light time |
 | Companion: questions answered from sourced protocols, plus an "I need help now" button | Emergency words reach the ground as a RED alert |
+| Mission tab: a mind map of today's activities (one branch per guidance card plus the daily routine, one leaf per step) with XP, levels, a streak and badges | |
 | Installable app (PWA) that works offline; Android and iOS through Capacitor | |
+
+The game layer is motivation only: XP, levels and badges never change a risk level, a card or the triage. Card steps earn XP on the server; the daily routine (exercise, sleep, check-in) is kept on the device, and the vitals and sync items complete themselves from real data.
 
 ## The four ideas that matter
 
@@ -140,6 +143,7 @@ No generative model makes clinical decisions. That is deliberate: in a medical c
 - NASA NTRS 20230001079, in-flight blood analysis demonstration: https://ntrs.nasa.gov/citations/20230001079
 - Royal College of Physicians, NEWS2: https://www.rcp.ac.uk/resources/national-early-warning-score-news-2/
 - HuBMAP CCF 3D Reference Object Library v1.2 (3D body and organs, CC BY 4.0): https://humanatlas.io
+- Daily routine: NASA, *Counteracting Bone and Muscle Loss in Microgravity* (about two hours of exercise a day): https://www.nasa.gov/missions/station/iss-research/counteracting-bone-and-muscle-loss-in-microgravity/ ; NASA Human Research Program, sleep evidence report (eight hours recommended, about six measured in flight): https://humanresearchroadmap.nasa.gov/evidence/reports/sleep.pdf
 - Guidance sources are listed per entry in `backend/knowledge_base.json` (CDC, MedlinePlus, NCI Biospecimen Research Database) and `backend/knowledge/space_protocols.json` (NASA NTRS 20040089364, 20160012725, 20150019624, 20220000516; NASA OCHMO-TB-004; RCP NEWS2).
 - Space Apps Participant Terms (third-party materials): https://www.spaceappschallenge.org/legal/
 

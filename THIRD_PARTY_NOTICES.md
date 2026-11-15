@@ -50,7 +50,9 @@ CDC (hypoglycemia 15-15 rule), MedlinePlus, University Hospitals of North Midlan
 NCI Biospecimen Research Database, NASA Technical Reports Server (20040089364, 20160012725,
 20150019624, 20150001655, 20220000516), NASA OCHMO Technical Brief OCHMO-TB-004, NASA Human
 Health and Performance risk page (SANS), Royal College of Physicians NEWS2 charts, Labcorp SI
-Unit Conversion Table. Exact URLs are in `backend/knowledge_base.json`,
+Unit Conversion Table, NASA "Counteracting Bone and Muscle Loss in Microgravity" and the NASA Human
+Research Program sleep evidence report (daily routine in the Mission tab, URLs in `app/src/lib/game.ts`).
+Exact URLs for the other entries are in `backend/knowledge_base.json`,
 `backend/knowledge/space_protocols.json` and `backend/switch_config.json`.
 
 ## AI-assisted development
