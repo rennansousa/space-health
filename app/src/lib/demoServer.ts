@@ -48,29 +48,43 @@ export class DemoError extends Error {
   }
 }
 
+let memState: DemoSeed | null = null;
+let saveTimer: number | null = null;
+
 function cloneSeed(): DemoSeed {
   return JSON.parse(JSON.stringify(SEED)) as DemoSeed;
 }
 
 function loadState(): DemoSeed {
+  if (memState) return memState;
+  const base = cloneSeed();
   try {
     const raw = window.localStorage.getItem(DEMO_STATE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as DemoSeed;
-      if (parsed && parsed.users && parsed.crew && parsed.ground) return parsed;
+      const parsed = JSON.parse(raw) as Partial<DemoSeed>;
+      if (parsed && parsed.crew && parsed.ground) {
+        base.crew = parsed.crew;
+        base.ground = parsed.ground;
+      }
     }
   } catch {
     /* ignore corrupt storage */
   }
-  return cloneSeed();
+  memState = base;
+  return memState;
 }
 
 function saveState(state: DemoSeed): void {
-  try {
-    window.localStorage.setItem(DEMO_STATE_KEY, JSON.stringify(state));
-  } catch {
-    /* ignore storage quota errors */
-  }
+  memState = state;
+  if (saveTimer !== null) window.clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(() => {
+    saveTimer = null;
+    try {
+      window.localStorage.setItem(DEMO_STATE_KEY, JSON.stringify({ crew: state.crew, ground: state.ground }));
+    } catch {
+      /* ignore storage quota errors */
+    }
+  }, 0);
 }
 
 function resolveCrewTarget(user: User | null, requested: string | null): string {
@@ -370,8 +384,12 @@ export function demoRequest<T>(method: 'GET' | 'POST', rawPath: string, body?: u
   }
 
   if (method === 'POST' && path === '/api/demo/reset') {
-    const fresh = cloneSeed();
-    saveState(fresh);
+    memState = cloneSeed();
+    try {
+      window.localStorage.removeItem(DEMO_STATE_KEY);
+    } catch {
+      /* ignore */
+    }
     return { ok: true } as T;
   }
 

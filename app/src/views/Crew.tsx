@@ -79,6 +79,8 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
 
   const organs = useMemo(() => (state ? organViews(state) : []), [state]);
   const regions = useMemo(() => (state ? regionViews(state, organs) : []), [state, organs]);
+  const organSt = useMemo(() => Object.fromEntries(organs.map((o) => [o.id, o.st])) as Record<OrganId, St>, [organs]);
+  const status = useMemo(() => Object.fromEntries(regions.map((r) => [r.id, r.st])) as Record<RegionId, St>, [regions]);
 
   if (!state) {
     return (
@@ -119,7 +121,6 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
     }
   }
 
-  const organSt = Object.fromEntries(organs.map((o) => [o.id, o.st])) as Record<OrganId, St>;
   const next = sortedCards(fresh)[0];
   function regionLine(r: RegionId): string {
     const rv = regions.find((x) => x.id === r)!;
@@ -130,7 +131,6 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
     return t('nothingHere');
   }
   const sync_st = cache ? 'off' : state.link.blackout ? 'black' : waiting > 0 ? 'pend' : 'on';
-  const status: Record<RegionId, St> = Object.fromEntries(regions.map((r) => [r.id, r.st])) as Record<RegionId, St>;
 
   return (
     <div className={`crew${chat ? ' chatting' : ''}`}>
@@ -181,7 +181,9 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
             <Race organs={organs} critical={critical.length > 0} onOpen={(id) => setOv({ k: 'organ', id })} />
             <aside className="side">
               <div className="side-body">
-                <BodyView status={status} organSt={organSt} selected={sideSel} onSelect={(r) => setSideSel(r === sideSel ? null : r)} label={t('bodyTitle')} focus={false} />
+                {ov?.k !== 'body' && (
+                  <BodyView status={status} organSt={organSt} selected={sideSel} onSelect={(r) => setSideSel((prev) => (r === prev ? null : r))} label={t('bodyTitle')} focus={false} />
+                )}
               </div>
               {sideSel ? (
                 <div className="side-card" key={sideSel}>

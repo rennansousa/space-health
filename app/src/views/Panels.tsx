@@ -5,7 +5,7 @@ import { Badge, Chips, Icon, Seg, Sheet, ST_ICON } from '../components/ui';
 import type { Card, CrewState } from '../types';
 import {
   fmt, REGION_IDS, REGION_ORGANS, regionViews, sortedCards, tierSt, timeline,
-  type HistKind, type OrganView, type RegionId, type St,
+  type HistKind, type OrganId, type OrganView, type RegionId, type St,
 } from '../lib/health';
 import { ago, clock, useLang } from '../lib/i18n';
 
@@ -267,7 +267,8 @@ export function BodySheet({ state, organs, initial, onClose, onReport }: { state
   const { t } = useLang();
   const regions = useMemo(() => regionViews(state, organs), [state, organs]);
   const [sel, setSel] = useState<RegionId>(() => initial ?? regions.find((r) => r.st === 'crit' || r.st === 'att')?.id ?? 'chest');
-  const status = Object.fromEntries(regions.map((r) => [r.id, r.st])) as Record<RegionId, St>;
+  const status = useMemo(() => Object.fromEntries(regions.map((r) => [r.id, r.st])) as Record<RegionId, St>, [regions]);
+  const organSt = useMemo(() => Object.fromEntries(organs.map((o) => [o.id, o.st])) as Partial<Record<OrganId, St>>, [organs]);
   const cur = regions.find((r) => r.id === sel)!;
   return (
     <Sheet
@@ -282,7 +283,7 @@ export function BodySheet({ state, organs, initial, onClose, onReport }: { state
     >
       <div className="body-layout">
         <div className="sheet-body3d">
-          <BodyView status={status} organSt={Object.fromEntries(organs.map((o) => [o.id, o.st]))} selected={sel} onSelect={setSel} label={t('bodyTitle')} />
+          <BodyView status={status} organSt={organSt} selected={sel} onSelect={setSel} label={t('bodyTitle')} />
         </div>
         <div className="col gap10 grow">
           <div className="region-list" role="radiogroup" aria-label={t('bodyTitle')}>

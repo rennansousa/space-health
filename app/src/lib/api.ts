@@ -40,11 +40,20 @@ export function getApiBase(): string {
   return `${protocol === 'https:' ? 'https' : 'http'}://${host}:8000`;
 }
 
+function isStaticDemoHost(): boolean {
+  if (store()?.getItem(KEY_API)) return false;
+  const h = window.location.hostname;
+  return h.endsWith('.github.io') || h.endsWith('.vercel.app') || h.endsWith('.netlify.app');
+}
+
+let useLocalDemo = isStaticDemoHost();
+
 export function setApiBase(url: string): void {
   const s = store();
   if (!s) return;
   if (url.trim()) s.setItem(KEY_API, url.trim());
   else s.removeItem(KEY_API);
+  useLocalDemo = isStaticDemoHost();
 }
 
 export class ApiError extends Error {
@@ -78,12 +87,6 @@ export function clearSession(): void {
   store()?.removeItem(KEY_USER);
 }
 
-function isStaticDemoHost(): boolean {
-  if (store()?.getItem(KEY_API)) return false;
-  const h = window.location.hostname;
-  return h.endsWith('.github.io') || h.endsWith('.vercel.app') || h.endsWith('.netlify.app');
-}
-
 function runDemo<T>(method: 'GET' | 'POST', path: string, body?: unknown): T {
   try {
     return demoRequest<T>(method, path, body, getUser());
@@ -96,7 +99,7 @@ function runDemo<T>(method: 'GET' | 'POST', path: string, body?: unknown): T {
 async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown, timeoutMs = 8000): Promise<T> {
   const token = getToken();
   const isDemoSession = Boolean(token?.startsWith('demo-token-') && path !== '/api/users' && path !== '/api/login');
-  if (isStaticDemoHost() || isDemoSession) {
+  if (useLocalDemo || isDemoSession) {
     return runDemo<T>(method, path, body);
   }
 
@@ -114,11 +117,13 @@ async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown, 
       signal: ctrl.signal,
     });
   } catch {
+    useLocalDemo = true;
     return runDemo<T>(method, path, body);
   } finally {
     clearTimeout(timer);
   }
   if (res.status === 404 || res.status >= 500) {
+    useLocalDemo = true;
     return runDemo<T>(method, path, body);
   }
   const data = await res.json().catch(() => ({}));
@@ -138,10 +143,12 @@ export async function getCached<T>(path: string): Promise<Cached<T>> {
   try {
     const data = await request<T>('GET', path);
     const savedAt = Date.now();
-    try {
-      store()?.setItem(key, JSON.stringify({ data, savedAt }));
-    } catch {
-      /* storage full: keep going with live data */
+    if (!useLocalDemo && !getToken()?.startsWith('demo-token-')) {
+      try {
+        store()?.setItem(key, JSON.stringify({ data, savedAt }));
+      } catch {
+        /* storage full: keep going with live data */
+      }
     }
     return { data, savedAt, fromCache: false };
   } catch (e) {

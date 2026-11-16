@@ -17,6 +17,18 @@ const TINT: Record<St, THREE.Color> = {
   crit: new THREE.Color('#ff5a4d'),
   none: new THREE.Color('#9fb0c8'),
 };
+const COL_WHITE = new THREE.Color('#ffffff');
+const COL_DIM = new THREE.Color('#5b6b85');
+const NO_RAYCAST = () => null;
+const REGION_BOXES: { id: RegionId; pos: [number, number, number]; args: [number, number, number] }[] = [
+  { id: 'head', pos: [0, 0.80, 0], args: [0.30, 0.24, 0.30] },
+  { id: 'chest', pos: [0, 0.54, 0], args: [0.36, 0.26, 0.28] },
+  { id: 'abdomen', pos: [0, 0.18, 0], args: [0.36, 0.44, 0.28] },
+  { id: 'armL', pos: [0.32, 0.32, 0], args: [0.24, 0.70, 0.26] },
+  { id: 'armR', pos: [-0.32, 0.32, 0], args: [0.24, 0.70, 0.26] },
+  { id: 'legL', pos: [0.12, -0.49, 0], args: [0.22, 0.86, 0.28] },
+  { id: 'legR', pos: [-0.12, -0.49, 0], args: [0.22, 0.86, 0.28] },
+];
 const ORGAN_COLOR: Record<string, string> = {
   heart: '#f0476b', lungs: '#64b4ff', kidneyL: '#f08a3e', kidneyR: '#f08a3e', liver: '#b2583c', spine: '#e9dfcf', brain: '#b08bff',
 };
@@ -85,8 +97,10 @@ function Model({ status, organSt, selected, onSelect }: { status: Record<RegionI
     r.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
+      m.raycast = NO_RAYCAST;
       if (m.name.startsWith('skin')) {
-        const geo = m.geometry as THREE.BufferGeometry;
+        const geo = (m.geometry as THREE.BufferGeometry).clone();
+        m.geometry = geo;
         const pos = geo.attributes.position;
         const v = new THREE.Vector3();
         const reg: RegionId[] = new Array(pos.count);
@@ -116,19 +130,23 @@ function Model({ status, organSt, selected, onSelect }: { status: Record<RegionI
     return { geo: brainGeometry(), mat };
   }, [root]);
 
+  const statusKey = `${status.head}|${status.chest}|${status.abdomen}|${status.armL}|${status.armR}|${status.legL}|${status.legR}|${selected ?? ''}`;
+
   // colour the skin by region status; the selected region is brighter, the rest a little dimmer
   useEffect(() => {
     const m = skinRef.current;
     if (!m) return;
     const col = (m.geometry as THREE.BufferGeometry).attributes.color as THREE.BufferAttribute;
     const tmp = new THREE.Color();
-    regions.current.forEach((r, i) => {
+    const reg = regions.current;
+    for (let i = 0; i < reg.length; i++) {
+      const r = reg[i];
       tmp.copy(TINT[status[r]]);
-      if (selected) tmp.lerp(r === selected ? new THREE.Color('#ffffff') : new THREE.Color('#5b6b85'), r === selected ? 0.25 : 0.45);
+      if (selected) tmp.lerp(r === selected ? COL_WHITE : COL_DIM, r === selected ? 0.25 : 0.45);
       col.setXYZ(i, tmp.r, tmp.g, tmp.b);
-    });
+    }
     col.needsUpdate = true;
-  }, [status, selected, root]);
+  }, [statusKey, root]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // organs needing attention pulse gently (never for "no data")
   useFrame(({ clock }) => {
@@ -143,27 +161,30 @@ function Model({ status, organSt, selected, onSelect }: { status: Record<RegionI
     }
   });
 
-  function click(e: ThreeEvent<MouseEvent>) {
+  function hitRegion(r: RegionId, e: ThreeEvent<MouseEvent>) {
     if (e.delta > 6) return; // it was a drag
     e.stopPropagation();
-    const organ = (e.object.userData.organ as string | undefined) ?? undefined;
-    if (organ) return onSelect(REGION_OF_ORGAN[organ]);
-    const face = e.face;
-    if (face) onSelect(regions.current[face.a]);
+    onSelect(r);
   }
 
   return (
-    <group onClick={click}>
+    <group>
       <primitive object={root} />
-      <mesh geometry={brain.geo} material={brain.mat} position={[0, 0.835, 0.015]} scale={[0.066, 0.054, 0.084]} userData={{ organ: 'brain' }} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.93, 0]}>
+      <mesh geometry={brain.geo} material={brain.mat} position={[0, 0.835, 0.015]} scale={[0.066, 0.054, 0.084]} raycast={NO_RAYCAST} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.93, 0]} raycast={NO_RAYCAST}>
         <ringGeometry args={[0.32, 0.36, 64]} />
         <meshBasicMaterial color="#5c8dff" transparent opacity={0.45} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.931, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.931, 0]} raycast={NO_RAYCAST}>
         <circleGeometry args={[0.32, 64]} />
         <meshBasicMaterial color="#5c8dff" transparent opacity={0.08} />
       </mesh>
+      {REGION_BOXES.map((b) => (
+        <mesh key={b.id} position={b.pos} onClick={(e) => hitRegion(b.id, e)}>
+          <boxGeometry args={b.args} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+        </mesh>
+      ))}
     </group>
   );
 }
