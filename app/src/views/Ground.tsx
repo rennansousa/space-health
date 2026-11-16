@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Badge, Icon, Toast } from '../components/ui';
 import { ApiError, apiPost, getCached } from '../lib/api';
 import { fmt, tierSt, type St } from '../lib/health';
@@ -23,11 +23,16 @@ export function Ground({ user, onSignOut }: { user: User; onSignOut: () => void 
   const [err, setErr] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [directive, setDirective] = useState<Record<string, string>>({});
+  const lastSig = useRef('');
 
   const load = useCallback(async () => {
     try {
       const r = await getCached<GroundState>('/api/ground/state');
-      setG(r.data);
+      const sig = JSON.stringify(r.data);
+      if (sig !== lastSig.current) {
+        lastSig.current = sig;
+        setG(r.data);
+      }
       setErr(r.fromCache ? t('offline') : '');
     } catch (e) {
       const ae = e as ApiError;

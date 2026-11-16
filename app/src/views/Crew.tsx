@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BodyView } from '../components/BodyView';
 import { Badge, Icon, Orb, Toast } from '../components/ui';
 import { ApiError, apiPost, flushOutbox, getCached, outboxCount, postOrQueue } from '../lib/api';
@@ -48,6 +48,7 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
   const [queued, setQueued] = useState(outboxCount());
   const [sideSel, setSideSel] = useState<RegionId | null>(null);
   const { acked, ack } = useAcks(user.user_id);
+  const lastSig = useRef('');
 
   const flash = useCallback((m: string) => {
     setToast(m);
@@ -57,7 +58,11 @@ export function Crew({ user, onSignOut }: { user: User; onSignOut: () => void })
   const load = useCallback(async () => {
     try {
       const r = await getCached<CrewState>('/api/crew/state');
-      setState(r.data);
+      const sig = JSON.stringify(r.data);
+      if (sig !== lastSig.current) {
+        lastSig.current = sig;
+        setState(r.data);
+      }
       setCache(r.fromCache);
       setErr('');
       if (!r.fromCache && outboxCount() > 0) {

@@ -148,18 +148,17 @@ function Model({ status, organSt, selected, onSelect }: { status: Record<RegionI
     col.needsUpdate = true;
   }, [statusKey, root]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // organs needing attention pulse gently (never for "no data")
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+  // highlight organs when status or selection changes (static update, no per-frame shader thrash)
+  useEffect(() => {
     for (const o of organMats.current) {
       const id = ORGAN_OF[o.name];
       const st = id ? organSt[id] : undefined;
       const sel = selected && REGION_OF_ORGAN[o.name] === selected;
-      const pulse = st === 'crit' ? 0.55 + 0.45 * Math.sin(t * 5) : st === 'att' ? 0.3 + 0.25 * Math.sin(t * 2.4) : 0.12;
-      o.mat.emissiveIntensity = sel ? Math.max(pulse, 0.35) : pulse;
+      const base = st === 'crit' ? 0.55 : st === 'att' ? 0.35 : 0.12;
+      o.mat.emissiveIntensity = sel ? Math.max(base, 0.38) : base;
       o.mat.color.set(st === 'none' ? '#8d99ab' : ORGAN_COLOR[o.name]);
     }
-  });
+  }, [organSt, selected, root]);
 
   function hitRegion(r: RegionId, e: ThreeEvent<MouseEvent>) {
     if (e.delta > 6) return; // it was a drag
@@ -224,11 +223,10 @@ export default function Body3D({
   const controls = useRef<OrbitImpl>(null);
   const [touched, setTouched] = useState(false);
   const [ok] = useState(hasWebGL);
-  const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if (!ok) return null;
   return (
     <div className="body3d" role="img" aria-label={label} onPointerDown={() => setTouched(true)}>
-      <Canvas camera={{ position: [0, 0.05, 3.25], fov: 34, near: 0.1, far: 20 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+      <Canvas camera={{ position: [0, 0.05, 3.25], fov: 34, near: 0.1, far: 20 }} dpr={1} gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}>
         <ambientLight intensity={0.7} />
         <hemisphereLight args={['#cfe0ff', '#1b2a44', 0.8]} />
         <directionalLight position={[1.5, 2.5, 2.5]} intensity={1.6} />
@@ -246,8 +244,7 @@ export default function Body3D({
           maxPolarAngle={Math.PI / 1.6}
           enableDamping
           rotateSpeed={0.7}
-          autoRotate={!touched && !reduce && !selected}
-          autoRotateSpeed={0.8}
+          autoRotate={false}
         />
         <Rig selected={selected} focus={focus} controls={controls} />
       </Canvas>
