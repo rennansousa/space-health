@@ -153,9 +153,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise ApiError(403, "Crew members can only see their own data.")
             return user["user_id"]
         if user["role"] == "CREW_MEDICAL_OFFICER":
-            if not requested:
-                raise ApiError(400, "astronautId is required for the Crew Medical Officer.")
-            return requested
+            return requested or "C003"
         raise ApiError(403, "This is a crew-side action.")
 
     def _dispatch(self, method: str) -> None:

@@ -4,6 +4,8 @@
 
 Offline-first health monitoring for crews on long space missions. Built for the NASA Space Apps Challenge 2026, challenge *Create Health Monitoring Software for Astronauts on Space Missions*, by a team at the Fortaleza (Brazil) local event.
 
+👉 **[Open Live Interactive Demo (Browser / No Install)](https://rennansousa.github.io/space-health/)** — works directly in the browser on desktop, tablet, or phone (includes an in-browser demo engine with the NASA OSD-575 data so evaluators can explore Crew, Organ Race, 3D Body, Mission Map, Companion, Smartwatch `#/watch`, and Flight Surgeon views with zero setup).
+
 > Prototype for a hackathon. **Not a medical device.** Guidance texts and alert limits are examples that flight medicine staff would have to set and review.
 
 ## Run it

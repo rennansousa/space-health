@@ -3,6 +3,7 @@
 // made without a connection wait in an outbox that is sent when the server is back.
 
 import type { User } from '../types';
+import { DemoError, demoRequest } from './demoServer';
 
 const KEY_API = 'sh.apiBase';
 const KEY_TOKEN = 'sh.token';
@@ -77,12 +78,33 @@ export function clearSession(): void {
   store()?.removeItem(KEY_USER);
 }
 
+function isStaticDemoHost(): boolean {
+  if (store()?.getItem(KEY_API)) return false;
+  const h = window.location.hostname;
+  return h.endsWith('.github.io') || h.endsWith('.vercel.app') || h.endsWith('.netlify.app');
+}
+
+function runDemo<T>(method: 'GET' | 'POST', path: string, body?: unknown): T {
+  try {
+    return demoRequest<T>(method, path, body, getUser());
+  } catch (e) {
+    if (e instanceof DemoError) throw new ApiError(e.status, e.message, e.code);
+    throw e;
+  }
+}
+
 async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown, timeoutMs = 8000): Promise<T> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const token = getToken();
+  const isDemoSession = Boolean(token?.startsWith('demo-token-') && path !== '/api/users' && path !== '/api/login');
+  if (isStaticDemoHost() || isDemoSession) {
+    return runDemo<T>(method, path, body);
+  }
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  const effectiveTimeout = path === '/api/users' ? Math.min(timeoutMs, 2500) : timeoutMs;
+  const timer = setTimeout(() => ctrl.abort(), effectiveTimeout);
   let res: Response;
   try {
     res = await fetch(`${getApiBase()}${path}`, {
@@ -92,9 +114,12 @@ async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown, 
       signal: ctrl.signal,
     });
   } catch {
-    throw new ApiError(0, 'offline');
+    return runDemo<T>(method, path, body);
   } finally {
     clearTimeout(timer);
+  }
+  if (res.status === 404 || res.status >= 500) {
+    return runDemo<T>(method, path, body);
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiError(res.status, (data as { error?: string }).error || `HTTP ${res.status}`, (data as { code?: string }).code);
